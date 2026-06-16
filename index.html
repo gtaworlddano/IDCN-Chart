@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSSSD Intelligence Brief - Operations Matrix</title>
+    <style>
+        /* Dark Tactical / Charcoal Desk Theme */
+        body {
+            background-color: #2a2b2d;
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        #hierarchy-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .brief-header {
+            width: 100%;
+            max-width: 1180px;
+            border-bottom: 2px solid #555;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+        }
+
+        .brief-header h1 {
+            font-size: 1.15rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #fff;
+        }
+
+        .brief-header p {
+            margin: 2px 0 0 0;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #aaa;
+        }
+
+        /* Tight Split Layout Container */
+        .main-split-container {
+            width: 100%;
+            max-width: 1180px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Left Panel: Compact Fronts & Special Trackers Hub */
+        .left-fronts-pane {
+            width: 210px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px dashed #555;
+            padding-right: 12px;
+            box-sizing: border-box;
+        }
+
+        /* Right Panel: High-Density Hierarchy */
+        .right-hierarchy-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-block {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .section-label {
+            font-size: 0.68rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid #666;
+            padding: 1px 6px;
+            margin-bottom: 10px;
+            background: #3a3c40;
+            color: #ddd;
+        }
+
+        .flex-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* Micro Profile Card Style - Weathered Manilla Tone to POP off Dark Gray */
+        .biz-profile-card {
+            background: #eadecc;
+            border: 1px dashed #444;
+            padding: 6px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            width: 100%;
+            color: #111;
+        }
+
+        .biz-profile-card.inactive-biz {
+            opacity: 0.45;
+            background: #b8af9f;
+            border-color: #666;
+        }
+
+        .biz-profile-card.status-box {
+            border: 1px solid #222;
+            background: #dfd5c3;
+        }
+
+        .biz-title {
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #800;
+            border-bottom: 1px solid #222;
+            padding-bottom: 1px;
+            margin-bottom: 2px;
+        }
+        .inactive-biz .biz-title { color: #444; }
+        .biz-profile-card.status-box .biz-title { color: #111; border-bottom-color: #555; }
+
+        .biz-tied-crew {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 4px;
+        }
+
+        .biz-surveillance-container {
+            width: 100%;
+            height: 80px;
+            background-color: #abb2a4;
+            border: 1px solid #777;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .biz-surveillance-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) sepia(5%) contrast(125%);
+        }
+
+        /* High-Density Target Box */
+        .role-box {
+            background: #eadecc;
+            border: 1px solid #444;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            width: 145px;
+            padding: 4px;
+            box-sizing: border-box;
+            color: #111;
+        }
+
+        .role-box.wide-box {
+            width: 180px;
+        }
+
+        .mugshot-container {
+            width: 100%;
+            height: 85px;
+            background-color: #abb2a4;
+            border: 1px solid #777;
+            margin-bottom: 4px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mugshot-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(125%);
+        }
+
+        .placeholder-photo {
+            font-size: 0.5rem;
+            color: #444;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1.1;
+        }
+
+        .role-title {
+            font-size: 0.62rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #fff;
+            background: #1a1a1a;
+            padding: 1px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .role-meta {
+            font-size: 0.6rem;
+            line-height: 1.15;
+            color: #111;
+        }
+
+        .target-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #000;
+            border-bottom: 1px dashed #999;
+            padding-bottom: 1px;
+            margin-bottom: 2px;
+        }
+
+        .target-blurb {
+            font-size: 0.55rem;
+            color: #333;
+            margin-top: 2px;
+            line-height: 1.1;
+        }
+
+        /* Deceased / Inactive State */
+        .inactive-box {
+            background: #aba090 !important;
+            border: 1px dashed #555 !important;
+            opacity: 0.55;
+        }
+        .inactive-box .role-title { background: #444 !important; }
+        .inactive-box .target-name { text-decoration: line-through; color: #333; }
+        .inactive-box .mugshot-container { opacity: 0.35; }
+
+        /* Pillar / Column Flow */
+        .operational-pillar-system {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .command-vertical-track {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .command-vertical-track.double-wide {
+            flex: 2;
+        }
+
+        .crew-pillar {
+            width: 100%;
+            border: 1px dashed #555;
+            padding: 6px;
+            background: rgba(234, 222, 204, 0.75);
+            box-sizing: border-box;
+            color: #111;
+        }
+
+        .crew-pillar.compact-pillar {
+            flex: 1;
+            min-width: 170px;
+        }
+
+        .crew-pillar.inactive-pillar {
+            background: rgba(171, 160, 144, 0.4);
+            opacity: 0.5;
+        }
+
+        .crew-name {
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-left: 2.5px solid #800;
+            padding-left: 4px;
+            margin-bottom: 6px;
+        }
+        
+        .inactive-pillar .crew-name { border-left-color: #444; text-decoration: line-through; }
+
+        .roster-list {
+            margin: 0 0 5px 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.58rem;
+        }
+
+        .roster-header {
+            font-size: 0.55rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #333;
+            margin-bottom: 2px;
+            border-bottom: 1px solid #999;
+        }
+
+        .roster-item {
+            padding-left: 6px;
+            position: relative;
+            line-height: 1.2;
+        }
+
+        .roster-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #800;
+        }
+
+        .roster-item.deceased { text-decoration: line-through; color: #555; }
+        .roster-item.deceased::before { color: #666; }
+        .inactive-pillar .roster-item::before { color: #444; }
+    </style>
+</head>
+<body>
+
+    <svg id="hierarchy-lines">
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#aaa" />
+            </marker>
+        </defs>
+        <line id="line-cahill" stroke="#999" stroke-width="1.2" />
+        <line id="line-molloy" stroke="#999" stroke-width="1.2" />
+        <line id="line-kernohan" stroke="#999" stroke-width="1.2" />
+        <line id="line-liaison" stroke="#999" stroke-width="1.2" />
+        <line id="line-advisor" stroke="#777" stroke-dasharray="2,2" stroke-width="1.2" />
+        <line id="line-quinn-vespucci" stroke="#aaa" stroke-width="1.2" marker-end="url(#arrow)" />
+        <line id="line-quinn-baycity" stroke="#aaa" stroke-width="1.2" marker-end="url(#arrow)" />
+        <line id="line-boyd-county" stroke="#aaa" stroke-width="1.2" />
+        <line id="line-fuller-blackcrown" stroke="#666" stroke-dasharray="2,2" stroke-width="1.2" />
+    </svg>
+
+    <div class="brief-header">
+        <h1>Los Santos County Sheriff's Department</h1>
+        <p>Major Crimes Bureau // Operations Hierarchy Matrix</p>
+    </div>
+
+    <div class="main-split-container">
+
+        <div class="left-fronts-pane">
+            <div class="section-label" style="text-align: center; width: 100%; box-sizing: border-box; margin-bottom: 8px;">Business Fronts</div>
+            
+            <div class="biz-profile-card">
+                <div class="biz-title">Donaleigh's Pub</div>
+                <div class="biz-tied-crew">Bay City Crew</div>
+                <div class="biz-surveillance-container">
+                    <img src="https://www.upload.ee/image/19448264/Screenshot_2026-06-15_200111.png" alt="Donaleigh's Pub">
+                </div>
+            </div>
+
+            <div class="biz-profile-card">
+                <div class="biz-title">Auntie P's</div>
+                <div class="biz-tied-crew">Impact 51</div>
+                <div class="biz-surveillance-container">
+                    <img src="https://www.upload.ee/image/19448266/Screenshot_2026-06-15_200330.png" alt="Auntie P's">
+                </div>
+            </div>
+
+            <div class="biz-profile-card">
+                <div class="biz-title">Pacific Coast Concrete</div>
+                <div class="biz-tied-crew">North County</div>
+                <div class="biz-surveillance-container">
+                    <div class="placeholder-photo">[ PENDING ]</div>
+                </div>
+            </div>
+
+            <div class="biz-profile-card inactive-biz">
+                <div class="biz-title">Black Crown Front</div>
+                <div class="biz-tied-crew">Black Crown</div>
+                <div class="biz-surveillance-container">
+                    <div class="placeholder-photo">[ ARCHIVED ]</div>
+                </div>
+            </div>
+
+            <div class="section-label" style="text-align: center; width: 100%; box-sizing: border-box; margin-top: 5px; margin-bottom: 8px;">Status & Casualty Log</div>
+
+            <div class="biz-profile-card status-box">
+                <div class="biz-title" style="border-left: 3px solid #b71c1c; padding-left: 4px;">James McLeod</div>
+                <div class="biz-tied-crew" style="color: #b71c1c; font-weight: bold;">Status: Informant</div>
+                <div class="target-blurb">Prior affiliation: Bay City Crew. Exfiltrated / Under protection log.</div>
+            </div>
+
+            <div class="biz-profile-card status-box" style="opacity: 0.7;">
+                <div class="biz-title" style="border-left: 3px solid #555; padding-left: 4px; text-decoration: line-through;">Joel Levin</div>
+                <div class="biz-tied-crew" style="color: #444; font-weight: bold;">Status: Deceased</div>
+                <div class="target-blurb">Case file sealed. Neutralized / Found within local county lines.</div>
+            </div>
+        </div>
+
+        <div class="right-hierarchy-pane">
+
+            <div class="section-block">
+                <div class="section-label">Transnational Network</div>
+                <div class="flex-row">
+                    
+                    <div class="role-box" id="node-cahill">
+                        <div class="role-title" style="background-color: #283593;">Logistics</div>
+                        <div class="mugshot-container"><div class="placeholder-photo">[ MISSING ]</div></div>
+                        <div class="role-meta">
+                            <div class="target-name">Brian Cahill</div>
+                            <div>AKA: Foreman // LKA: Ireland</div>
+                        </div>
+                    </div>
+
+                    <div class="role-box" id="node-molloy">
+                        <div class="role-title" style="background-color: #283593;">Financer</div>
+                        <div class="mugshot-container">
+                            <img src="https://www.upload.ee/image/19448151/Screenshot_2026-06-14_180609.png" alt="Molloy">
+                        </div>
+                        <div class="role-meta">
+                            <div class="target-name">Conor Molloy</div>
+                            <div>AKA: Enforcer // Wanted</div>
+                        </div>
+                    </div>
+
+                    <div class="role-box" id="node-kernohan-top">
+                        <div class="role-title" style="background-color: #283593;">Liaison</div>
+                        <div class="mugshot-container">
+                            <img src="https://www.upload.ee/image/19448152/Screenshot_2026-06-14_180624.png" alt="Kernohan">
+                        </div>
+                        <div class="role-meta">
+                            <div class="target-name">Andrew Kernohan</div>
+                            <div>AKA: Kerny // LKA: International</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex-row" style="margin: -4px 0;">
+                <div class="role-box wide-box" id="node-moran" style="border: 1px dashed #800;">
+                    <div class="role-title" style="background-color: #7f0000;">State Liaison</div>
+                    <div class="mugshot-container"><img src="https://www.upload.ee/image/18271271/Screenshot_2025-06-09_185712.png" alt="Moran"></div>
+                    <div class="role-meta">
+                        <div class="target-name" style="text-align: center;">Dennis Moran</div>
+                        <div style="text-align: center; margin-bottom: 3px;">AKA: Big Mo</div>
+                        <div class="target-blurb">Running the Bay City Mob since 2016. Known link between state-side ops and transnational network ties.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-label">Bay City Mob Structure</div>
+                
+                <div class="flex-row" style="margin-bottom: 15px; gap: 20px;">
+                    <div class="role-box" id="node-boss">
+                        <div class="role-title" style="background-color: #880e4f;">Street Boss</div>
+                        <div class="mugshot-container">
+                            <img src="https://www.upload.ee/image/19448150/Screenshot_2026-06-15_181827.png" alt="Brennan Connors">
+                        </div>
+                        <div class="role-meta">
+                            <div class="target-name">Brennan Connors</div>
+                            <div class="target-blurb">Leadership figure as of 2026.</div>
+                        </div>
+                    </div>
+                    <div class="role-box" id="node-advisor" style="border-color: #4e342e;">
+                        <div class="role-title" style="background-color: #4e342e;">Advisor</div>
+                        <div class="mugshot-container"><div class="placeholder-photo">[ PHOTO UNKNOWN ]</div></div>
+                        <div class="role-meta"><div class="target-name">Joe Tulsa</div></div>
+                    </div>
+                </div>
+
+                <div class="operational-pillar-system">
+                    
+                    <div class="command-vertical-track double-wide">
+                        <div class="role-box" id="node-quinn">
+                            <div class="role-title" style="background-color: #9e4d0a;">Lieutenant</div>
+                            <div class="mugshot-container"><img src="https://www.upload.ee/image/19444980/image.png" alt="Quinn"></div>
+                            <div class="role-meta">
+                                <div class="target-name">Patrick Quinn</div>
+                                <div>AKA: Wiz</div>
+                                <div class="target-blurb">Running city operations as of 2026.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-row" style="gap: 8px; width: 100%;">
+                            <div class="crew-pillar compact-pillar" id="crew-vespucci">
+                                <div class="crew-name">Impact 51</div>
+                                <div class="roster-header">Known Members</div>
+                                <ul class="roster-list"><li class="roster-item">Oisin McGeady</li></ul>
+                                <div class="roster-header">Known Associates</div>
+                                <ul class="roster-list">
+                                    <li class="roster-item">Aidan Gilmore</li>
+                                    <li class="roster-item">Michael Murrily</li>
+                                    <li class="roster-item">Shane McGrath</li>
+                                    <li class="roster-item">Rian Morris</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="crew-pillar compact-pillar" id="crew-baycity">
+                                <div class="crew-name">Bay City Crew</div>
+                                <div class="roster-header">Known Members</div>
+                                <ul class="roster-list">
+                                    <li class="roster-item deceased">James McLeod</li>
+                                    <li class="roster-item">Adrian Donegan</li>
+                                </ul>
+                                <div class="roster-header">Known Associates</div>
+                                <ul class="roster-list">
+                                    <li class="roster-item">Dominic Hogan</li>
+                                    <li class="roster-item">Ian Keogh</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="command-vertical-track">
+                        <div class="role-box wide-box" id="node-boyd">
+                            <div class="role-title" style="background-color: #9e4d0a;">Acting LT</div>
+                            <div class="mugshot-container"><div class="placeholder-photo">[ PHOTO UNKNOWN ]</div></div>
+                            <div class="role-meta">
+                                <div class="target-name">Travis Boyd</div>
+                                <div class="target-blurb">Word has spread he is expanding operations into the county.</div>
+                            </div>
+                        </div>
+                        <div class="crew-pillar" id="crew-county">
+                            <div class="crew-name">North County</div>
+                            <div class="roster-header">Known Members</div>
+                            <ul class="roster-list">
+                                <li class="roster-item deceased">Martin Farley</li>
+                                <li class="roster-item">Seamus Breen</li>
+                            </ul>
+                            <div class="roster-header">Known Associates</div>
+                            <ul class="roster-list">
+                                <li class="roster-item">Peter Lanagan</li>
+                                <li class="roster-item">Owen Duffy</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="command-vertical-track">
+                        <div class="role-box inactive-box" id="node-fuller">
+                            <div class="role-title">Lieutenant</div>
+                            <div class="mugshot-container"><div class="placeholder-photo">[ MISSING ]</div></div>
+                            <div class="role-meta"><div class="target-name">Anjawon Fuller</div></div>
+                        </div>
+                        <div class="crew-pillar inactive-pillar" id="crew-blackcrown">
+                            <div class="crew-name">Black Crown</div>
+                            <div class="roster-header">Known Members</div>
+                            <ul class="roster-list">
+                                <li class="roster-item">Ryan Murphy</li>
+                                <li class="roster-item">Reshay Tyrone</li>
+                            </ul>
+                            <div class="roster-header">Known Associates</div>
+                            <ul class="roster-list">
+                                <li class="roster-item">Kelvin Flatts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function runMappingSystem() {
+            const connections = [
+                { start: 'node-cahill', end: 'node-moran', edge: 'top-down', line: document.getElementById('line-cahill') },
+                { start: 'node-molloy', end: 'node-moran', edge: 'top-down', line: document.getElementById('line-molloy') },
+                { start: 'node-kernohan-top', end: 'node-moran', edge: 'top-down', line: document.getElementById('line-kernohan') },
+                { start: 'node-moran', end: 'node-boss', edge: 'top-down', line: document.getElementById('line-liaison') },
+                { start: 'node-boss', end: 'node-advisor', edge: 'side-to-side', line: document.getElementById('line-advisor') },
+                { start: 'node-quinn', end: 'crew-vespucci', edge: 'top-down', line: document.getElementById('line-quinn-vespucci') },
+                { start: 'node-quinn', end: 'crew-baycity', edge: 'top-down', line: document.getElementById('line-quinn-baycity') },
+                { start: 'node-boyd', end: 'crew-county', edge: 'top-down', line: document.getElementById('line-boyd-county') },
+                { start: 'node-fuller', end: 'crew-blackcrown', edge: 'top-down', line: document.getElementById('line-fuller-blackcrown') }
+            ];
+
+            connections.forEach(path => {
+                const sNode = document.getElementById(path.start);
+                const eNode = document.getElementById(path.end);
+                
+                if (sNode && eNode && path.line) {
+                    const sRect = sNode.getBoundingClientRect();
+                    const eRect = eNode.getBoundingClientRect();
+                    let x1, y1, x2, y2;
+
+                    if (path.edge === 'top-down') {
+                        x1 = sRect.left + (sRect.width / 2) + window.scrollX;
+                        y1 = sRect.bottom + window.scrollY;
+                        x2 = eRect.left + (eRect.width / 2) + window.scrollX;
+                        y2 = eRect.top + window.scrollY;
+                    } else if (path.edge === 'side-to-side') {
+                        x1 = sRect.right + window.scrollX;
+                        y1 = sRect.top + (sRect.height / 2) + window.scrollY;
+                        x2 = eRect.left + window.scrollX;
+                        y2 = eRect.top + (eRect.height / 2) + window.scrollY;
+                    }
+                    path.line.setAttribute('x1', x1); path.line.setAttribute('y1', y1);
+                    path.line.setAttribute('x2', x2); path.line.setAttribute('y2', y2);
+                }
+            });
+        }
+        window.addEventListener('load', runMappingSystem);
+        window.addEventListener('resize', runMappingSystem);
+    </script>
+</body>
+</html>
