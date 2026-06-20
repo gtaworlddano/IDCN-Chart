@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSSSD Intelligence Brief - Operations Matrix</title>
+    <style>
+        /* Mil-Spec Digital Terminal Theme - Rugged & Professional */
+        body {
+            background-color: #0f1012;
+            /* Subtle tactical grid */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: #d1d5db;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        #hierarchy-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Stark, professional federal header */
+        .brief-header {
+            width: 100%;
+            max-width: 1280px;
+            border-bottom: 3px solid #4b5563;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 2;
+        }
+
+        .header-titles h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #f3f4f6;
+            font-family: 'Arial Black', Impact, sans-serif;
+        }
+
+        .header-titles p {
+            margin: 2px 0 0 0;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #9ca3af;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .classification-stamp {
+            border: 2px solid #991b1b;
+            color: #ef4444;
+            padding: 4px 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            transform: rotate(-2deg);
+            background: rgba(153, 27, 27, 0.1);
+        }
+
+        .main-three-column-container {
+            width: 100%;
+            max-width: 1280px;
+            display: grid;
+            grid-template-columns: 210px 1fr 260px;
+            gap: 16px;
+            align-items: flex-start;
+            z-index: 2;
+            position: relative;
+        }
+
+        .left-command-pane, .center-pillars-pane, .right-fronts-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .right-fronts-pane {
+            border-left: 2px solid #374151;
+            padding-left: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Rugged Industrial Section Labels */
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-left: 4px solid #4b5563;
+            padding: 4px 8px;
+            margin-bottom: 10px;
+            background: #1f2937;
+            color: #f3f4f6;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: left;
+        }
+
+        .flex-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 14px;
+            width: 100%;
+        }
+
+        /* Brutalist Target Cards */
+        .role-box {
+            background: #1e2024;
+            border: 1px solid #374151;
+            border-top: 3px solid #6b7280;
+            width: 185px;
+            padding: 8px;
+            box-sizing: border-box;
+            color: #d1d5db;
+            /* Hard offset shadow for rugged look */
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .role-box::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 6px;
+            height: 6px;
+            background: #4b5563;
+            border-radius: 50%;
+        }
+
+        .role-box.wide-box {
+            width: 230px;
+            border-top-color: #991b1b;
+        }
+        
+        .role-box.wide-box::after { background: #ef4444; }
+
+        .role-title {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            padding: 3px 6px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        /* Mugshot styling - high contrast, grimy digital */
+        .mugshot-container {
+            width: 100%;
+            height: 120px;
+            background-color: #111;
+            border: 1px solid #4b5563;
+            margin-bottom: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .mugshot-container::before {
+            content: 'SYS.IMG.REC';
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 0.5rem;
+            color: rgba(255,255,255,0.3);
+            z-index: 10;
+        }
+
+        .mugshot-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Gritty security cam filter */
+            filter: grayscale(100%) contrast(140%) brightness(0.9);
+            mix-blend-mode: luminosity;
+        }
+
+        /* Specific face framing overrides */
+        #node-molloy .mugshot-container img { object-position: center 12%; }
+        #node-kernohan-top .mugshot-container img { object-position: center 8%; }
+        #node-moran .mugshot-container img { object-position: center 15%; }
+        #node-boss .mugshot-container img { object-position: center 10%; }
+        #node-quinn .mugshot-container img { object-position: center top; }
+
+        .placeholder-photo {
+            font-size: 0.7rem;
+            color: #ef4444;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px dashed #ef4444;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .role-meta {
+            font-size: 0.75rem;
+            line-height: 1.3;
+            color: #9ca3af;
+        }
+
+        .target-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #f3f4f6;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .target-blurb {
+            font-size: 0.7rem;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .target-blurb b {
+            color: #d1d5db;
+        }
+
+        /* Inactive / Dead states - Cold & Redacted */
+        .inactive-box {
+            background: #18181a !important;
+            border-color: #333 !important;
+            opacity: 0.6;
+        }
+        .inactive-box .role-title { background: #333 !important; color: #777; }
+        .inactive-box .target-name { text-decoration: line-through; color: #666; }
+        .inactive-box .mugshot-container img { filter: grayscale(100%) contrast(100%) brightness(0.3); }
+
+        /* Tactical Crew Pillars */
+        .operational-pillar-system {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .command-vertical-track {
+            box-sizing: border-box;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .command-vertical-track.double-wide { flex: 1.9; }
+
+        .crew-pillar {
+            width: 100%;
+            border: 1px solid #374151;
+            padding: 8px;
+            background: #1e2024;
+            box-sizing: border-box;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.6);
+        }
+
+        .crew-pillar.compact-pillar {
+            flex: 1;
+            min-width: 170px;
+        }
+
+        .crew-pillar.inactive-pillar {
+            background: #151618;
+            border: 1px dashed #333;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        .crew-name {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-left: 3px solid #4b5563;
+            padding-left: 8px;
+            margin-bottom: 10px;
+            color: #f3f4f6;
+            background: rgba(255,255,255,0.03);
+            padding-top: 3px;
+            padding-bottom: 3px;
+        }
+
+        .crew-pillar.inactive-pillar .crew-name { border-left-color: #333; text-decoration: line-through; }
+
+        .roster-list {
+            margin: 0 0 10px 0;
+            padding: 0;
+            list-style: none;
+            font-size: 0.75rem;
+        }
+
+        .roster-header {
+            font-size: 0.65rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 4px;
+            border-bottom: 1px dotted #374151;
+            padding-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .roster-item {
+            padding-left: 12px;
+            position: relative;
+            line-height: 1.4;
+            color: #d1d5db;
+        }
+
+        .roster-item::before {
+            content: ">";
+            position: absolute;
+            left: 0;
+            color: #4b5563;
+            font-weight: bold;
+        }
+
+        .roster-item.deceased { text-decoration: line-through; color: #ef4444; opacity: 0.8; }
+        .roster-item.deceased::before { content: "X"; color: #ef4444; }
+
+        /* Professional Business Cards */
+        .biz-profile-card {
+            background: #1e2024;
+            border: 1px solid #374151;
+            padding: 8px;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.6);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .biz-profile-card.inactive-biz {
+            opacity: 0.5;
+            background: #111;
+            border: 1px dashed #333;
+            box-shadow: none;
+        }
+
+        .biz-profile-card.status-box {
+            border-left: 4px solid #4b5563;
+            background: #25282d;
+        }
+
+        .biz-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #f3f4f6;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .inactive-biz .biz-title { color: #666; }
+
+        .biz-tied-crew {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            background: #111;
+            padding: 2px 6px;
+            display: inline-block;
+            border: 1px solid #333;
+        }
+
+        .biz-surveillance-container {
+            width: 100%;
+            height: 75px;
+            background-color: #000;
+            border: 1px solid #374151;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .biz-surveillance-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(150%) brightness(0.7);
+        }
+
+    </style>
+</head>
+<body>
+
+    <svg id="hierarchy-lines">
+        <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280" />
+            </marker>
+            <marker id="arrow-red" viewBox="0 0 10 10" refX="4" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#991b1b" />
+            </marker>
+        </defs>
+        <line id="line-transnational-link" stroke="#4b5563" stroke-dasharray="4,4" stroke-width="2" />
+        <line id="line-moran-to-boss" stroke="#991b1b" stroke-width="2" marker-end="url(#arrow-red)" />
+        <line id="line-boss-to-advisor" stroke="#6b7280" stroke-dasharray="2,4" stroke-width="1.5" />
+        <line id="line-boss-to-quinn" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)" />
+        <line id="line-boss-to-boyd" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)" />
+        <line id="line-boss-to-fuller" stroke="#374151" stroke-dasharray="2,2" stroke-width="1.5" />
+        <line id="line-quinn-vespucci" stroke="#6b7280" stroke-width="2" />
+        <line id="line-quinn-baycity" stroke="#6b7280" stroke-width="2" />
+        <line id="line-boyd-county" stroke="#6b7280" stroke-width="2" />
+        <line id="line-fuller-blackcrown" stroke="#374151" stroke-dasharray="2,2" stroke-width="1.5" />
+    </svg>
+
+    <div class="brief-header">
+        <div class="header-titles">
+            <h1>LSSSD // Major Crimes Bureau</h1>
+            <p>Intelligence Matrix: Operations Hierarchy</p>
+        </div>
+        <div class="classification-stamp">Confidential / Law Enforcement Sensitive</div>
+    </div>
+
+    <div class="main-three-column-container">
+
+        <div class="left-command-pane">
+            <div class="section-label">01. Transnational</div>
+            
+            <div class="role-box" id="node-cahill">
+                <div class="role-title" style="background-color: #1e3a8a;">Logistics</div>
+                <div class="mugshot-container"><div class="placeholder-photo">[ NO VISUAL DATA ]</div></div>
+                <div class="role-meta">
+                    <div class="target-name">Brian Cahill</div>
+                    <div class="target-blurb">AKA: Foreman<br>LKA: Ireland</div>
+                </div>
+            </div>
+
+            <div class="role-box" id="node-molloy">
+                <div class="role-title" style="background-color: #1e3a8a;">Financer</div>
+                <div class="mugshot-container"><img src="https://www.upload.ee/image/19448151/Screenshot_2026-06-14_180609.png" alt="Molloy"></div>
+                <div class="role-meta">
+                    <div class="target-name">Conor Molloy</div>
+                    <div class="target-blurb">AKA: Enforcer<br><b style="color: #ef4444;">Status: Wanted</b></div>
+                </div>
+            </div>
+
+            <div class="role-box" id="node-kernohan-top">
+                <div class="role-title" style="background-color: #1e3a8a;">Liaison</div>
+                <div class="mugshot-container"><img src="https://www.upload.ee/image/19448152/Screenshot_2026-06-14_180624.png" alt="Kernohan"></div>
+                <div class="role-meta">
+                    <div class="target-name">Andrew Kernohan</div>
+                    <div class="target-blurb">AKA: Kerny<br>LKA: International</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-pillars-pane">
+            <div class="section-label">02. Local Structure (Bay City)</div>
+
+            <div class="flex-row" style="margin-bottom: 4px;" id="node-apex-row">
+                <div class="role-box wide-box" id="node-moran">
+                    <div class="role-title" style="background-color: #7f1d1d;">State Liaison / Apex</div>
+                    <div class="mugshot-container"><img src="https://www.upload.ee/image/18271271/Screenshot_2025-06-09_185712.png" alt="Moran"></div>
+                    <div class="role-meta">
+                        <div class="target-name" style="text-align: center;">Dennis Moran</div>
+                        <div style="text-align: center; font-size: 0.7rem; color: #6b7280; margin-bottom: 4px;">AKA: Big Mo</div>
+                        <div class="target-blurb">Running the Bay City Mob since 2016. Main operational pipeline into international channels.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-row" style="gap: 24px; margin-bottom: 8px;">
+                <div class="role-box" id="node-boss">
+                    <div class="role-title" style="background-color: #831843;">Street Boss</div>
+                    <div class="mugshot-container"><img src="https://www.upload.ee/image/19448150/Screenshot_2026-06-15_181827.png" alt="Brennan Connors"></div>
+                    <div class="role-meta">
+                        <div class="target-name">Brennan Connors</div>
+                        <div class="target-blurb">Leadership figure as of 2026.</div>
+                    </div>
+                </div>
+                <div class="role-box" id="node-advisor" style="border-top-color: #b45309;">
+                    <div class="role-title" style="background-color: #78350f;">Advisor</div>
+                    <div class="mugshot-container"><div class="placeholder-photo">[ NO VISUAL DATA ]</div></div>
+                    <div class="role-meta">
+                        <div class="target-name">Joe Tulsa</div>
+                        <div class="target-blurb">General advisor to state-side leadership.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="operational-pillar-system">
+                
+                <div class="command-vertical-track double-wide">
+                    <div class="role-box" id="node-quinn" style="border-top-color: #065f46;">
+                        <div class="role-title" style="background-color: #064e3b;">Lieutenant</div>
+                        <div class="mugshot-container"><img src="https://www.upload.ee/image/19444980/image.png" alt="Quinn"></div>
+                        <div class="role-meta">
+                            <div class="target-name">Patrick Quinn</div>
+                            <div class="target-blurb">AKA: Wiz<br>Running city operations as of 2026.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-row" style="gap: 12px;">
+                        <div class="crew-pillar compact-pillar" id="crew-vespucci">
+                            <div class="crew-name">Impact 51</div>
+                            <div class="roster-header">Known Members</div>
+                            <ul class="roster-list"><li class="roster-item">Oisin McGeady</li></ul>
+                            <div class="roster-header">Known Associates</div>
+                            <ul class="roster-list">
+                                <li class="roster-item">Aidan Gilmore</li>
+                                <li class="roster-item">Michal Murrily</li>
+                                <li class="roster-item">Shane McGrath</li>
+                                <li class="roster-item">Rian Morris</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="crew-pillar compact-pillar" id="crew-baycity">
+                            <div class="crew-name">Bay City Crew</div>
+                            <div class="roster-header">Known Members</div>
+                            <ul class="roster-list">
+                                <li class="roster-item deceased">James McLeod</li>
+                                <li class="roster-item">Adrian Donegan</li>
+                            </ul>
+                            <div class="roster-header">Known Associates</div>
+                            <ul class="roster-list">
+                                <li class="roster-item">Dominic Hogan</li>
+                                <li class="roster-item">Ian Keogh</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-vertical-track">
+                    <div class="role-box" id="node-boyd" style="border-top-color: #065f46;">
+                        <div class="role-title" style="background-color: #064e3b;">Acting LT</div>
+                        <div class="mugshot-container"><div class="placeholder-photo">[ NO VISUAL DATA ]</div></div>
+                        <div class="role-meta">
+                            <div class="target-name">Travis Boyd</div>
+                            <div class="target-blurb">Expanding operations into the county regions.</div>
+                        </div>
+                    </div>
+                    <div class="crew-pillar" id="crew-county">
+                        <div class="crew-name">North County</div>
+                        <div class="roster-header">Known Members</div>
+                        <ul class="roster-list">
+                            <li class="roster-item deceased">Martin Farley</li>
+                            <li class="roster-item">Seamus Breen</li>
+                        </ul>
+                        <div class="roster-header">Known Associates</div>
+                        <ul class="roster-list">
+                            <li class="roster-item">Peter Lanagan</li>
+                            <li class="roster-item">Owen Duffy</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="command-vertical-track">
+                    <div class="role-box inactive-box" id="node-fuller">
+                        <div class="role-title">Lieutenant</div>
+                        <div class="mugshot-container"><div class="placeholder-photo" style="border-color: #666; color: #666;">[ ARCHIVED ]</div></div>
+                        <div class="role-meta">
+                            <div class="target-name">Anjawon Fuller</div>
+                            <div class="target-blurb">Track archived / Suspended ops.</div>
+                        </div>
+                    </div>
+                    <div class="crew-pillar inactive-pillar" id="crew-blackcrown">
+                        <div class="crew-name">Black Crown</div>
+                        <div class="roster-header">Known Members</div>
+                        <ul class="roster-list">
+                            <li class="roster-item">Ryan Murphy</li>
+                            <li class="roster-item">Reshay Tyrone</li>
+                        </ul>
+                        <div class="roster-header">Known Associates</div>
+                        <ul class="roster-list">
+                            <li class="roster-item">Kelvin Flatts</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="right-fronts-pane">
+            <div class="section-label">03. Business Fronts</div>
+            
+            <div class="biz-profile-card">
+                <div class="biz-title">Donaleigh's Pub</div>
+                <div class="biz-tied-crew">Bay City Crew Front</div>
+                <div class="biz-surveillance-container">
+                    <img src="https://www.upload.ee/image/19448264/Screenshot_2026-06-15_200111.png" alt="Donaleigh's Pub">
+                </div>
+            </div>
+
+            <div class="biz-profile-card">
+                <div class="biz-title">Auntie P's</div>
+                <div class="biz-tied-crew">Impact 51 Front</div>
+                <div class="biz-surveillance-container">
+                    <img src="https://www.upload.ee/image/19448266/Screenshot_2026-06-15_200330.png" alt="Auntie P's">
+                </div>
+            </div>
+
+            <div class="biz-profile-card">
+                <div class="biz-title">Pacific Coast Concrete</div>
+                <div class="biz-tied-crew">North County Front</div>
+                <div class="biz-surveillance-container"><div class="placeholder-photo" style="border-color: #4b5563; color: #9ca3af;">[ PENDING ASSET ]</div></div>
+            </div>
+
+            <div class="biz-profile-card inactive-biz">
+                <div class="biz-title">Black Crown Front</div>
+                <div class="biz-tied-crew">INACTIVE</div>
+            </div>
+
+            <div class="section-label" style="margin-top: 10px;">04. Casualty Log</div>
+
+            <div class="biz-profile-card status-box" style="border-left-color: #fbbf24;">
+                <div class="biz-title" style="color: #fbbf24;">James McLeod</div>
+                <div class="target-blurb"><b style="color: #fbbf24;">CONFIDENTIAL INFORMANT</b><br>Active since 2025.</div>
+            </div>
+
+            <div class="biz-profile-card status-box" style="border-left-color: #ef4444; opacity: 0.7;">
+                <div class="biz-title" style="text-decoration: line-through; color: #ef4444;">Joel Levin</div>
+                <div class="target-blurb"><b style="color: #ef4444;">DECEASED // 187 PC</b><br>Case sealed. Found within local county lines.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function runMappingSystem() {
+            const lines = {
+                transnationalLink: document.getElementById('line-transnational-link'),
+                moranToBoss: document.getElementById('line-moran-to-boss'),
+                bossToAdvisor: document.getElementById('line-boss-to-advisor'),
+                bossToQuinn: document.getElementById('line-boss-to-quinn'),
+                bossToBoyd: document.getElementById('line-boss-to-boyd'),
+                bossToFuller: document.getElementById('line-boss-to-fuller'),
+                quinnVespucci: document.getElementById('line-quinn-vespucci'),
+                quinnBaycity: document.getElementById('line-quinn-baycity'),
+                boydCounty: document.getElementById('line-boyd-county'),
+                fullerBlackcrown: document.getElementById('line-fuller-blackcrown')
+            };
+
+            const nodes = {
+                molloy: document.getElementById('node-molloy'),
+                moran: document.getElementById('node-moran'),
+                boss: document.getElementById('node-boss'),
+                advisor: document.getElementById('node-advisor'),
+                quinn: document.getElementById('node-quinn'),
+                boyd: document.getElementById('node-boyd'),
+                fuller: document.getElementById('node-fuller'),
+                vespucci: document.getElementById('crew-vespucci'),
+                baycity: document.getElementById('crew-baycity'),
+                county: document.getElementById('crew-county'),
+                blackcrown: document.getElementById('crew-blackcrown')
+            };
+
+            const scrollX = window.scrollX;
+            const scrollY = window.scrollY;
+
+            if (nodes.molloy && nodes.moran && lines.transnationalLink) {
+                const molloyRect = nodes.molloy.getBoundingClientRect();
+                const moranRect = nodes.moran.getBoundingClientRect();
+                lines.transnationalLink.setAttribute('x1', molloyRect.right + scrollX);
+                lines.transnationalLink.setAttribute('y1', molloyRect.top + (molloyRect.height / 2) + scrollY);
+                lines.transnationalLink.setAttribute('x2', moranRect.left + scrollX);
+                lines.transnationalLink.setAttribute('y2', moranRect.top + (moranRect.height / 2) + scrollY);
+            }
+
+            if (nodes.moran && nodes.boss && lines.moranToBoss) {
+                const moranRect = nodes.moran.getBoundingClientRect();
+                const bossRect = nodes.boss.getBoundingClientRect();
+                lines.moranToBoss.setAttribute('x1', moranRect.left + (moranRect.width / 2) + scrollX);
+                lines.moranToBoss.setAttribute('y1', moranRect.bottom + scrollY);
+                lines.moranToBoss.setAttribute('x2', bossRect.left + (bossRect.width / 2) + scrollX);
+                lines.moranToBoss.setAttribute('y2', bossRect.top + scrollY);
+            }
+
+            if (nodes.boss && nodes.advisor && lines.bossToAdvisor) {
+                const bossRect = nodes.boss.getBoundingClientRect();
+                const advRect = nodes.advisor.getBoundingClientRect();
+                lines.bossToAdvisor.setAttribute('x1', bossRect.right + scrollX);
+                lines.bossToAdvisor.setAttribute('y1', bossRect.top + (bossRect.height / 2) + scrollY);
+                lines.bossToAdvisor.setAttribute('x2', advRect.left + scrollX);
+                lines.bossToAdvisor.setAttribute('y2', advRect.top + (advRect.height / 2) + scrollY);
+            }
+
+            const connectTopDown = (startNode, endNode, lineEl) => {
+                if (startNode && endNode && lineEl) {
+                    const sRect = startNode.getBoundingClientRect();
+                    const eRect = endNode.getBoundingClientRect();
+                    lineEl.setAttribute('x1', sRect.left + (sRect.width / 2) + scrollX);
+                    lineEl.setAttribute('y1', sRect.bottom + scrollY);
+                    lineEl.setAttribute('x2', eRect.left + (eRect.width / 2) + scrollX);
+                    lineEl.setAttribute('y2', eRect.top + scrollY);
+                }
+            };
+
+            connectTopDown(nodes.boss, nodes.quinn, lines.bossToQuinn);
+            connectTopDown(nodes.boss, nodes.boyd, lines.bossToBoyd);
+            connectTopDown(nodes.boss, nodes.fuller, lines.bossToFuller);
+            connectTopDown(nodes.quinn, nodes.vespucci, lines.quinnVespucci);
+            connectTopDown(nodes.quinn, nodes.baycity, lines.quinnBaycity);
+            connectTopDown(nodes.boyd, nodes.county, lines.boydCounty);
+            connectTopDown(nodes.fuller, nodes.blackcrown, lines.fullerBlackcrown);
+        }
+
+        window.addEventListener('load', runMappingSystem);
+        window.addEventListener('resize', runMappingSystem);
+    </script>
+</body>
+</html>
